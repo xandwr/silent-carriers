@@ -3,6 +3,7 @@
 [node name="Game" type="Node"]
 
 [node name="SceneSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://fwyi7j6degoj", "uid://co5igpiwbylwf")
 spawn_path = NodePath("../CurrentScene")
 spawn_limit = 1
 
