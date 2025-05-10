@@ -27,5 +27,6 @@ func _on_imgui_layout() -> void:
 	
 	ImGui.Text("Peer ID: %s" % multiplayer.get_unique_id())
 	ImGui.Text("Player Name: %s" % GameManager.player_instance.name if GameManager.player_instance else "<null>")
+	ImGui.Text("Current scene: %s" % GameManager.current_scene_name if GameManager.current_scene_name else "<null>")
 	
 	ImGui.End()

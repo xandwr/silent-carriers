@@ -1,24 +1,26 @@
-[gd_scene load_steps=2 format=3 uid="uid://fwyi7j6degoj"]
+[gd_scene load_steps=5 format=3 uid="uid://fwyi7j6degoj"]
 
 [ext_resource type="Script" uid="uid://cjyxadliphelw" path="res://scripts/networking/NetworkedScene.gd" id="1_smuca"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_smuca"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_igbvv"]
+sky_material = SubResource("ProceduralSkyMaterial_smuca")
+
+[sub_resource type="Environment" id="Environment_mlvv4"]
+background_mode = 2
+sky = SubResource("Sky_igbvv")
+tonemap_mode = 2
+glow_enabled = true
 
 [node name="Safehouse" type="Node3D" node_paths=PackedStringArray("player_container")]
 script = ExtResource("1_smuca")
 player_container = NodePath("Players")
 
-[node name="Label" type="Label" parent="."]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -11.5
-offset_right = 20.0
-offset_bottom = 11.5
-grow_horizontal = 2
-grow_vertical = 2
-text = "Safehouse"
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_mlvv4")
 
 [node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("uid://bfd1m7fd2g0sj")

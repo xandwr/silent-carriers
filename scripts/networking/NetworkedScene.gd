@@ -9,6 +9,7 @@ class_name NetworkedScene extends Node
 
 func _ready() -> void:
 	print("NetworkedScene loaded: %s" % name)
+	GameManager.current_scene_name = name
 
 
 func spawn_player(peer_id: int) -> void:
