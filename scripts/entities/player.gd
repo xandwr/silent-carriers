@@ -1,7 +1,11 @@
 class_name Player extends CharacterBody3D
 
-@export var walk_speed: float = 3.5
+@export_category("Camera Settings")
 @export var mouse_sensitivity: float = 0.001
+
+@export_category("Movement Settings")
+@export var walk_speed: float = 3.5
+@export var sprint_speed: float = 6.0
 @export var jump_force: float = 4.0
 
 @onready var camera_pivot: Marker3D = $CameraPivot
@@ -10,7 +14,7 @@ class_name Player extends CharacterBody3D
 @onready var player_mesh: MeshInstance3D = $PlayerCapsuleMesh
 @onready var player_eyes_mesh: MeshInstance3D = $PlayerCapsuleMesh/EyesMesh
 
-
+var current_move_speed: float = 0.0
 var mouse_locked: bool = true:
 	set(value):
 		mouse_locked = value
@@ -74,7 +78,8 @@ func _process_movement(delta: float) -> void:
 	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y += jump_force
 	
-	var move_dir = transform.basis * Vector3(input_dir.x, 0, input_dir.y) * walk_speed
+	current_move_speed = sprint_speed if Input.is_action_pressed("sprint") else walk_speed
+	var move_dir = transform.basis * Vector3(input_dir.x, 0, input_dir.y) * current_move_speed
 	velocity.x = move_dir.x
 	velocity.z = move_dir.z
 	
