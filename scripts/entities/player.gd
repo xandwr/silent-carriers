@@ -40,6 +40,7 @@ func _ready() -> void:
 		mouse_locked = false
 		set_physics_process(true)
 		set_process_input(true)
+		
 	else:
 		# Non-authority peers only run visual updates
 		set_physics_process(false)
@@ -47,6 +48,8 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	name_label.text = PlayerRegistry.get_player_name(multiplayer.get_unique_id())
+	
 	if not is_multiplayer_authority(): return
 	
 	if get_multiplayer_authority() == multiplayer.get_unique_id():

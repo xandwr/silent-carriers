@@ -17,6 +17,9 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath("CameraPivot:rotation:x")
 properties/2/spawn = true
 properties/2/replication_mode = 2
+properties/3/path = NodePath("NameLabel:text")
+properties/3/spawn = true
+properties/3/replication_mode = 1
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_0on4b"]
 radius = 0.2
