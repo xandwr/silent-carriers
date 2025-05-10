@@ -6,20 +6,12 @@ signal connection_failed()
 signal player_connected(peer_id: int)
 signal player_disconnected(peer_id: int)
 
-var server_manager: ServerManager
-var client_manager: ClientManager
 var is_host: bool = false
 
 
 func _ready() -> void:
 	multiplayer.peer_connected.connect(_on_player_connected)
 	multiplayer.peer_disconnected.connect(_on_player_disconnected)
-	
-	server_manager = ServerManager
-	client_manager = ClientManager
-	
-	server_manager.network_manager = self
-	client_manager.network_manager = self
 	
 	var cmd_args = OS.get_cmdline_args()
 	
@@ -36,11 +28,17 @@ func host_game(port: int = 7000, max_players: int = 4) -> void:
 	
 	if error == OK:
 		multiplayer.multiplayer_peer = peer
-		server_manager.activate()
+		ServerManager.activate()
 		is_host = true
 		
 		# Host also acts as a client
-		client_manager.activate()
+		ClientManager.activate()
+		
+		# Register the host in the PlayerRegistry with proper name
+		PlayerRegistry.register_player(multiplayer.get_unique_id(), {
+			"name": "Host"
+		})
+		
 		connection_established.emit()
 	else:
 		connection_failed.emit()
@@ -48,7 +46,7 @@ func host_game(port: int = 7000, max_players: int = 4) -> void:
 	
 	# Waiting for a frame here is CRITICAL because the client needs a second to join the server and sync
 	await get_tree().process_frame
-	load_scene_and_spawn_all(SceneManager.scenes.safehouse)
+	ServerManager.load_scene_and_spawn_all(SceneManager.scenes.safehouse)
 
 
 func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
@@ -57,7 +55,7 @@ func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
 	
 	if error == OK:
 		multiplayer.multiplayer_peer = peer
-		client_manager.activate()
+		ClientManager.activate()
 		is_host = false
 		
 		connection_established.emit()
@@ -73,10 +71,6 @@ func load_scene_and_spawn_all(path: String) -> void:
 	
 	var current_scene = SceneManager.current_scene
 	if current_scene is NetworkedScene:
-		for peer_id in multiplayer.get_peers():
-			current_scene.spawn_player(peer_id)
-	
-		# Also spawn the host's player
 		current_scene.spawn_player(multiplayer.get_unique_id())
 
 
@@ -94,6 +88,7 @@ func _on_player_connected(peer_id: int) -> void:
 		var current_scene = SceneManager.current_scene
 		if current_scene is NetworkedScene:
 			current_scene.spawn_player(peer_id)
+			PlayerRegistry.register_player(peer_id)
 
 
 func _on_player_disconnected(peer_id: int) -> void:

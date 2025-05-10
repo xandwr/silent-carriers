@@ -3,7 +3,7 @@ extends Node
 
 var player_instance: Player
 var current_scene_name: String
-var local_player_name: String = "Player"
+var local_player_name: String = ""
 
 
 func _ready() -> void:
