@@ -19,5 +19,7 @@ func spawn_player(peer_id: int) -> void:
 	
 	var player = player_scene.instantiate() as Player
 	player.name = str(peer_id)
+	player.player_name = "Host" if NetworkManager.is_host else "Client"
+	
 	player.set_multiplayer_authority(peer_id)
 	player_container.add_child(player, true)

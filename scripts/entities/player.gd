@@ -1,5 +1,15 @@
 class_name Player extends CharacterBody3D
 
+## The user-defined name of the player
+var _player_name: String = ""
+@export var player_name: String:
+	get:
+		return _player_name
+	set(value):
+		_player_name = value
+		if name_label:
+			name_label.text = value
+
 @export_category("Camera Settings")
 @export var mouse_sensitivity: float = 0.001
 
@@ -10,6 +20,7 @@ class_name Player extends CharacterBody3D
 
 @onready var camera_pivot: Marker3D = $CameraPivot
 @onready var player_camera: Camera3D = $CameraPivot/PlayerCamera
+@onready var name_label: Label3D = $NameLabel
 
 @onready var player_mesh: MeshInstance3D = $PlayerCapsuleMesh
 @onready var player_eyes_mesh: MeshInstance3D = $PlayerCapsuleMesh/EyesMesh
@@ -31,6 +42,10 @@ func _ready() -> void:
 		player_camera.current = true
 	
 	if is_multiplayer_authority():
+		player_name = GameManager.local_player_name
+	_update_name_display()
+	
+	if is_multiplayer_authority():
 		# Authority peer handles physics and input
 		mouse_locked = false
 		set_physics_process(true)
@@ -39,6 +54,11 @@ func _ready() -> void:
 		# Non-authority peers only run visual updates
 		set_physics_process(false)
 		set_process_input(false)
+
+
+func _update_name_display() -> void:
+	if name_label:
+		name_label.text = player_name
 
 
 func _physics_process(delta: float) -> void:

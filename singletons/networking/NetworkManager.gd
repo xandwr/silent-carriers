@@ -69,13 +69,14 @@ func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
 ## Loads a scene and spawns all players in it, if able
 func load_scene_and_spawn_all(path: String) -> void:
 	SceneManager.load_scene(path, true)
+	if not NetworkManager.is_host: return
 	
 	var current_scene = SceneManager.current_scene
 	if current_scene is NetworkedScene:
 		for peer_id in multiplayer.get_peers():
 			current_scene.spawn_player(peer_id)
-		
-		# Also spawn the host's player and set their GameManager's player_instance
+	
+		# Also spawn the host's player
 		current_scene.spawn_player(multiplayer.get_unique_id())
 
 
