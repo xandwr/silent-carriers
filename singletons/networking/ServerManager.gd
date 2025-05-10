@@ -28,8 +28,6 @@ func _on_player_connected(peer_id: int) -> void:
 	# Emit signal through NetworkManager
 	NetworkManager.player_connected.emit(peer_id)
 	
-	spawn_player(peer_id)
-	
 	if multiplayer.is_server():
 		# Send current registry to the new player
 		PlayerRegistry.rpc_id(peer_id, "sync_player_registry", PlayerRegistry.players)
