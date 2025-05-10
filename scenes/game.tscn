@@ -1,3 +1,9 @@
 [gd_scene format=3 uid="uid://bghkmw7o7n0mu"]
 
 [node name="Game" type="Node"]
+
+[node name="SceneSpawner" type="MultiplayerSpawner" parent="."]
+spawn_path = NodePath("../CurrentScene")
+spawn_limit = 1
+
+[node name="CurrentScene" type="Node" parent="."]

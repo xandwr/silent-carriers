@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.4", "Forward Plus")
 
 [autoload]
 
+SceneManager="*res://singletons/SceneManager.gd"
 ServerManager="*res://singletons/networking/ServerManager.gd"
 ClientManager="*res://singletons/networking/ClientManager.gd"
 NetworkManager="*res://singletons/networking/NetworkManager.gd"

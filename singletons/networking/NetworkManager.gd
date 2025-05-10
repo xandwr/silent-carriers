@@ -44,6 +44,12 @@ func host_game(port: int = 7000, max_players: int = 4) -> void:
 		connection_established.emit()
 	else:
 		connection_failed.emit()
+		return
+	
+	# Load two scenes to test synced states
+	SceneManager.load_scene(SceneManager.scenes.safehouse, true)
+	await get_tree().create_timer(3).timeout
+	SceneManager.load_scene(SceneManager.scenes.terrain, true)
 
 
 func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
@@ -58,6 +64,9 @@ func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
 		connection_established.emit()
 	else:
 		connection_failed.emit()
+		return
+	
+	SceneManager.load_scene(SceneManager.scenes.safehouse, true)
 
 
 ## Returns true if this instance is the authority for the provided Node.
