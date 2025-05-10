@@ -6,6 +6,9 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:	
+	if get_multiplayer_authority() == multiplayer.get_unique_id():
+		GameManager.player_instance = self
+	
 	if is_multiplayer_authority():
 		# Authority peer handles physics and input
 		set_physics_process(true)

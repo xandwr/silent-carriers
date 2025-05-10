@@ -23,5 +23,9 @@ func _ready() -> void:
 
 func _on_imgui_layout() -> void:
 	ImGui.Begin("Debug")
+	ImGui.SetWindowSize(Vector2(200, 100))
+	
 	ImGui.Text("Peer ID: %s" % multiplayer.get_unique_id())
+	ImGui.Text("Player Name: %s" % GameManager.player_instance.name if GameManager.player_instance else "<null>")
+	
 	ImGui.End()

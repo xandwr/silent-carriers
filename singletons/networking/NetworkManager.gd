@@ -75,7 +75,7 @@ func load_scene_and_spawn_all(path: String) -> void:
 		for peer_id in multiplayer.get_peers():
 			current_scene.spawn_player(peer_id)
 		
-		# Also spawn the host's player
+		# Also spawn the host's player and set their GameManager's player_instance
 		current_scene.spawn_player(multiplayer.get_unique_id())
 
 
