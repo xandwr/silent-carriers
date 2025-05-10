@@ -11,7 +11,14 @@ config_version=5
 [application]
 
 config/name="Silent Carriers"
+run/main_scene="uid://bghkmw7o7n0mu"
 config/features=PackedStringArray("4.4", "Forward Plus")
+
+[autoload]
+
+ServerManager="*res://singletons/networking/ServerManager.gd"
+ClientManager="*res://singletons/networking/ClientManager.gd"
+NetworkManager="*res://singletons/networking/NetworkManager.gd"
 
 [display]
 
