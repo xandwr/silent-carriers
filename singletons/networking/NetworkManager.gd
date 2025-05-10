@@ -46,12 +46,9 @@ func host_game(port: int = 7000, max_players: int = 4) -> void:
 		connection_failed.emit()
 		return
 	
-	# Loading two scenes to test synced states.
 	# Waiting for a frame here is CRITICAL because the client needs a second to join the server and sync
 	await get_tree().process_frame
-	SceneManager.load_scene(SceneManager.scenes.safehouse, true)
-	await get_tree().create_timer(3).timeout
-	SceneManager.load_scene(SceneManager.scenes.terrain, true)
+	load_scene_and_spawn_all(SceneManager.scenes.safehouse)
 
 
 func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
@@ -69,6 +66,19 @@ func join_game(ip: String = "127.0.0.1", port: int = 7000) -> void:
 		return
 
 
+## Loads a scene and spawns all players in it, if able
+func load_scene_and_spawn_all(path: String) -> void:
+	SceneManager.load_scene(path, true)
+	
+	var current_scene = SceneManager.current_scene
+	if current_scene is NetworkedScene:
+		for peer_id in multiplayer.get_peers():
+			current_scene.spawn_player(peer_id)
+		
+		# Also spawn the host's player
+		current_scene.spawn_player(multiplayer.get_unique_id())
+
+
 ## Returns true if this instance is the authority for the provided Node.
 func is_authority_for(node: Node) -> bool:
 	return node.get_multiplayer_authority() == multiplayer.get_unique_id()
@@ -77,6 +87,12 @@ func is_authority_for(node: Node) -> bool:
 func _on_player_connected(peer_id: int) -> void:
 	print("Player %d connected." % peer_id)
 	player_connected.emit(peer_id)
+	
+	# Only host/server authority spawns players
+	if is_host:
+		var current_scene = SceneManager.current_scene
+		if current_scene is NetworkedScene:
+			current_scene.spawn_player(peer_id)
 
 
 func _on_player_disconnected(peer_id: int) -> void:

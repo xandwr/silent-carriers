@@ -1,9 +1,10 @@
-[gd_scene format=3 uid="uid://fwyi7j6degoj"]
+[gd_scene load_steps=2 format=3 uid="uid://fwyi7j6degoj"]
 
-[node name="Safehouse" type="Node3D"]
+[ext_resource type="Script" uid="uid://cjyxadliphelw" path="res://scripts/networking/NetworkedScene.gd" id="1_smuca"]
 
-[node name="Camera3D" type="Camera3D" parent="."]
-current = true
+[node name="Safehouse" type="Node3D" node_paths=PackedStringArray("player_container")]
+script = ExtResource("1_smuca")
+player_container = NodePath("Players")
 
 [node name="Label" type="Label" parent="."]
 anchors_preset = 8
@@ -18,3 +19,9 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 text = "Safehouse"
+
+[node name="PlayerSpawner" type="MultiplayerSpawner" parent="."]
+_spawnable_scenes = PackedStringArray("uid://bfd1m7fd2g0sj")
+spawn_path = NodePath("../Players")
+
+[node name="Players" type="Node" parent="."]

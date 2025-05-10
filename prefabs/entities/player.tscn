@@ -1,10 +1,21 @@
-[gd_scene load_steps=3 format=3 uid="uid://bfd1m7fd2g0sj"]
+[gd_scene load_steps=4 format=3 uid="uid://bfd1m7fd2g0sj"]
 
 [ext_resource type="Script" uid="uid://b041ef8jiw1ra" path="res://scripts/entities/player.gd" id="1_0on4b"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_sh265"]
 radius = 0.2
 height = 1.8
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_0on4b"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:rotation:y")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("CameraPivot:rotation:x")
+properties/2/spawn = true
+properties/2/replication_mode = 2
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_0on4b")
@@ -20,3 +31,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 fov = 70.0
 near = 0.01
 far = 2500.0
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_0on4b")

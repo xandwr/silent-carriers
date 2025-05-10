@@ -1,7 +1,11 @@
 class_name Player extends CharacterBody3D
 
 
-func _ready() -> void:
+func _enter_tree() -> void:
+	set_multiplayer_authority(name.to_int())
+
+
+func _ready() -> void:	
 	if is_multiplayer_authority():
 		# Authority peer handles physics and input
 		set_physics_process(true)
@@ -12,5 +16,5 @@ func _ready() -> void:
 		set_process_input(false)
 
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if not is_multiplayer_authority(): return
