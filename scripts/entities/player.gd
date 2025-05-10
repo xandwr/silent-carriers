@@ -2,6 +2,7 @@ class_name Player extends CharacterBody3D
 
 @export var walk_speed: float = 3.5
 @export var mouse_sensitivity: float = 0.001
+@export var jump_force: float = 4.0
 
 @onready var camera_pivot: Marker3D = $CameraPivot
 @onready var player_camera: Camera3D = $CameraPivot/PlayerCamera
@@ -58,7 +59,7 @@ func _input(event: InputEvent) -> void:
 		mouse_locked = !mouse_locked
 
 
-func _process_movement(_delta: float) -> void:
+func _process_movement(delta: float) -> void:
 	if not is_multiplayer_authority(): return
 	
 	var input_dir: Vector2
@@ -67,9 +68,16 @@ func _process_movement(_delta: float) -> void:
 	else:
 		input_dir = Vector2.ZERO
 	
-	var move_dir = transform.basis * Vector3(input_dir.x, 0, input_dir.y)
+	if not is_on_floor():
+		velocity.y += get_gravity().y * delta
 	
-	velocity = move_dir * walk_speed
+	if Input.is_action_just_pressed("jump") and is_on_floor():
+		velocity.y += jump_force
+	
+	var move_dir = transform.basis * Vector3(input_dir.x, 0, input_dir.y) * walk_speed
+	velocity.x = move_dir.x
+	velocity.z = move_dir.z
+	
 	move_and_slide()
 
 
