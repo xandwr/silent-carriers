@@ -19,10 +19,13 @@ properties/2/spawn = true
 properties/2/replication_mode = 2
 properties/3/path = NodePath("CameraPivot/PlayerCamera/HoldPoint:position")
 properties/3/spawn = true
-properties/3/replication_mode = 1
+properties/3/replication_mode = 2
 properties/4/path = NodePath("CameraPivot/PlayerCamera/HoldPoint:rotation")
 properties/4/spawn = true
 properties/4/replication_mode = 2
+properties/5/path = NodePath(".:player_name")
+properties/5/spawn = true
+properties/5/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_0on4b"]
 radius = 0.2

@@ -2,7 +2,7 @@
 extends PeerManager
 
 ## A dictionary of connected peers (peer id, player info)
-var connected_peers: Dictionary[int, Dictionary] = {}
+var connected_peers: Dictionary[String, Dictionary] = {}
 
 
 func activate() -> void:
@@ -21,16 +21,18 @@ func deactivate() -> void:
 
 func _on_player_connected(peer_id: int) -> void:
 	print("Server: Player %d connected." % peer_id)
-	connected_peers[peer_id] = {
-		"name": "Player %d" % peer_id
+	var player_info = {
+		"name": "Player %d" % peer_id,
+		"color": Color.from_hsv(randf(), 0.8, 0.9),
+		"ready": false
 	}
 	
-	# Emit signal through NetworkManager
+	PlayerRegistry.register_player(peer_id, player_info)
 	NetworkManager.player_connected.emit(peer_id)
 	
 	if multiplayer.is_server():
-		# Send current registry to the new player
-		PlayerRegistry.rpc_id(peer_id, "sync_player_registry", PlayerRegistry.players)
+		# Send updated registry to ALL peers (not just the new one goddammit lol)
+		NetworkManager.rpc("_client_receive_player_registry", PlayerRegistry.players)
 
 
 func _on_player_disconnected(peer_id: int) -> void:
@@ -43,7 +45,11 @@ func _on_player_disconnected(peer_id: int) -> void:
 func spawn_player(peer_id: int) -> void:
 	var current_scene = SceneManager.current_scene
 	if current_scene is NetworkedScene:
-		current_scene.spawn_player(peer_id)
+		var player = current_scene.spawn_player(peer_id)
+		var player_name = PlayerRegistry.get_player_name(peer_id)
+		if player:
+			player.rpc_id(peer_id, "set_player_name", player_name)
+			player.rpc("set_player_name", player_name)
 
 
 func load_scene_and_spawn_all(path: String) -> void:
@@ -55,3 +61,6 @@ func load_scene_and_spawn_all(path: String) -> void:
 	
 	# Also spawn the host's player
 	spawn_player(multiplayer.get_unique_id())
+	
+	await get_tree().process_frame  # Wait for nodes to be ready
+	NetworkManager.update_all_player_names()

@@ -43,7 +43,9 @@ func host_game(port: int = 7000, max_players: int = 4) -> void:
 		
 		# Register the host in the PlayerRegistry with proper name
 		PlayerRegistry.register_player(multiplayer.get_unique_id(), {
-			"name": "Host"
+			"name": "Host",
+			"color": Color.from_hsv(randf(), 0.8, 0.9),
+			"ready": false
 		})
 		
 		connection_established.emit()
@@ -89,8 +91,8 @@ func _on_player_connected(peer_id: int) -> void:
 	if is_host:
 		var current_scene = SceneManager.current_scene
 		if current_scene is NetworkedScene:
-			current_scene.spawn_player(peer_id)
 			PlayerRegistry.register_player(peer_id)
+			current_scene.spawn_player(peer_id)
 
 
 func _on_player_disconnected(peer_id: int) -> void:
@@ -103,6 +105,12 @@ func _on_player_disconnected(peer_id: int) -> void:
 		body.freeze = false
 		body.held_by = 0
 		held_by_peer.erase(peer_id)
+
+
+## PLAYER REGISTRY RPCS ##
+@rpc("authority", "reliable")
+func _client_receive_player_registry(registry: Dictionary) -> void:
+	PlayerRegistry.players = registry
 
 
 ## ITEM PICKUP RPCS ##
@@ -150,8 +158,23 @@ func _server_request_drop() -> void:
 		body.rpc("sync_held_by", 0)
 
 
+@rpc("authority", "reliable")
+func update_all_player_names() -> void:
+	# Call this after loading a scene to ensure all player names are up to date
+	if not multiplayer.is_server(): return
+	
+	for peer_id_str in PlayerRegistry.players:
+		var peer_id = int(peer_id_str)
+		var player = PlayerRegistry.get_player(peer_id)
+		var player_name = PlayerRegistry.get_player_name(peer_id)
+		
+		if player:
+			# Sync to everyone
+			player.rpc("set_player_name", player_name)
+
+
 ## Updates the position of held objects for each player from the server.
-func _update_pickables(delta: float) -> void:
+func _update_pickables(_delta: float) -> void:
 	if not multiplayer.is_server(): return
 	
 	for peer_id in held_by_peer.keys():

@@ -1,5 +1,7 @@
 class_name Player extends CharacterBody3D
 
+@export var player_name: String
+
 @export_category("Camera Settings")
 @export var mouse_sensitivity: float = 0.001
 
@@ -51,13 +53,13 @@ func _ready() -> void:
 		set_process_input(false)
 
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:	
 	scoreboard.player_list.clear()
 	for peer_id in PlayerRegistry.players:
 		if peer_id == str(multiplayer.get_unique_id()):
-			scoreboard.player_list.add_item(peer_id + " (you)")
+			scoreboard.player_list.add_item(PlayerRegistry.players[peer_id].name + " (you)")
 		else:
-			scoreboard.player_list.add_item(peer_id)
+			scoreboard.player_list.add_item(PlayerRegistry.players[peer_id].name)
 	
 	if Input.is_action_pressed("scoreboard"):
 		scoreboard.visible = true
@@ -141,5 +143,11 @@ func _process_mouselook(mouse_event: InputEventMouseMotion) -> void:
 	)
 	
 	rotation.y -= mouse_motion.x
-
+	
 	scoreboard.visible = false
+
+
+@rpc("any_peer", "call_local", "reliable")
+func set_player_name(_name: String) -> void:
+	player_name = _name
+	name_label.text = _name

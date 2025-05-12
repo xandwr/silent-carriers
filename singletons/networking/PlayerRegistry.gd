@@ -25,7 +25,7 @@ func register_player(peer_id: int, info: Dictionary = {}) -> void:
 	players[key] = info
 	player_registered.emit(peer_id, info)
 	
-	print("Player registered: %d - %s" % [peer_id, info.get("name", "Unknown")])
+	print("Player registered: %d - %s" % [peer_id, str(info)])
 
 
 ## Removes a player from the registry
@@ -65,14 +65,14 @@ func get_player_name(peer_id: int) -> String:
 @rpc("any_peer", "reliable")
 func register_client_info(info: Dictionary) -> void:
 	var peer_id = multiplayer.get_remote_sender_id()
-	register_player(peer_id, info)
 	
-	# If we're the server, broadcast updated players list to everyone
 	if multiplayer.is_server():
+		# Register the client's info first
+		register_player(peer_id, info)
+		# Then sync the updated registry
 		rpc("sync_player_registry", players)
 
 
 @rpc("authority", "reliable")
 func sync_player_registry(registry_data: Dictionary) -> void:
-	# Update our local copy with server's authoritative data
 	players = registry_data

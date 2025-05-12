@@ -1,6 +1,6 @@
 [gd_scene load_steps=5 format=3 uid="uid://paf44kxq6kf7"]
 
-[ext_resource type="Script" uid="uid://xhk8hcrh4s5t" path="res://prefabs/pickable.gd" id="1_e3dqo"]
+[ext_resource type="Script" uid="uid://xhk8hcrh4s5t" path="res://scripts/pickable.gd" id="1_e3dqo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_x3iho"]
 

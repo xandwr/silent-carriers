@@ -14,7 +14,7 @@ func _ready() -> void:
 	spawn_package(Vector3(0, 5, -5))
 
 
-func spawn_player(peer_id: int) -> void:
+func spawn_player(peer_id: int) -> Player:
 	if not player_container:
 		push_error("Player container not set in NetworkedScene %s!" % name)
 		return
@@ -24,6 +24,7 @@ func spawn_player(peer_id: int) -> void:
 	
 	player.set_multiplayer_authority(peer_id)
 	player_container.add_child(player, true)
+	return player
 
 
 func spawn_package(position: Vector3) -> void:
