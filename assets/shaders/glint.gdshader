@@ -57,7 +57,8 @@ void fragment( )
     vertex = rotation * vertex;
 
 	float width = shine_width * 0.001 * cycle_interval;
-	float frequency = floor( sin( vertex.z * cycle_interval + TIME * shine_speed * cycle_interval ) + width);
+	float sine = sin(vertex.z * cycle_interval + TIME * shine_speed);
+	float frequency = smoothstep(1.0 - width, 1.0, sine);
 	ALBEDO = shine_color.rgb;
 	ALPHA = clamp( ( 1.0 - dot( NORMAL, VIEW ) ) * frequency * shine_color.a, 0.0, 1.0 );
 }
