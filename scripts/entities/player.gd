@@ -24,6 +24,8 @@ var mouse_locked: bool = true:
 	set(value):
 		mouse_locked = value
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if value else Input.MOUSE_MODE_VISIBLE
+
+var attempted_pickup: Pickable = null
 var held_body: Pickable = null
 
 
@@ -85,13 +87,13 @@ func _try_pickup():
 	if interaction_raycast.is_colliding():
 		var body = interaction_raycast.get_collider() as Pickable
 		if body:
-			held_body = body
+			attempted_pickup = body
 			NetworkManager.rpc_id(1, "_server_request_pickup", body.get_path())
 
 
 func _drop_body():
 	NetworkManager.rpc_id(1, "_server_request_drop")
-	held_body = null
+	if held_body: held_body = null
 
 
 func _process_movement(delta: float) -> void:

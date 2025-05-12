@@ -111,15 +111,31 @@ func _server_request_pickup(body_path: NodePath) -> void:
 	if not multiplayer.is_server():
 		return
 	
+	var peer_id = multiplayer.get_remote_sender_id()
 	var body = get_node_or_null(body_path) as Pickable
+	var success := false
+	
 	if body and body.held_by == 0:
-		var peer_id = multiplayer.get_remote_sender_id()
 		held_by_peer[peer_id] = body
 		body.held_by = peer_id
+		body.rpc("sync_held_by", peer_id)
 		body.freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
 		body.freeze = true
+		success = true
+	
+	rpc_id(peer_id, "_client_pickup_result", success)
+
+
+@rpc("authority", "call_local", "reliable")
+func _client_pickup_result(success: bool) -> void:
+	var local_player = GameManager.player_instance
+	if not local_player: return
+
+	if success and local_player.attempted_pickup:
+		local_player.held_body = local_player.attempted_pickup
 	else:
-		print("Pickup denied: already held or invalid body")
+		print("Pickup failed or invalid")
+	local_player.attempted_pickup = null
 
 
 @rpc("any_peer", "call_local", "reliable")
@@ -131,14 +147,15 @@ func _server_request_drop() -> void:
 		held_by_peer.erase(peer)
 		body.freeze = false
 		body.held_by = 0
+		body.rpc("sync_held_by", 0)
 
 
 ## Updates the position of held objects for each player from the server.
-func _update_pickables(_delta: float) -> void:
+func _update_pickables(delta: float) -> void:
 	if not multiplayer.is_server(): return
 	
 	for peer_id in held_by_peer.keys():
 		var body: Pickable = held_by_peer[peer_id]
 		var player: Player = PlayerRegistry.get_player(peer_id)
 		if player and body:
-			body.global_transform = player.hold_point.global_transform 
+			body.global_position = player.hold_point.global_position

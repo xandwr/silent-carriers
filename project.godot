@@ -84,11 +84,9 @@ interact={
 
 [physics]
 
-common/physics_ticks_per_second=128
-common/max_physics_steps_per_frame=16
-common/physics_jitter_fix=0.0
+common/physics_ticks_per_second=100
+common/max_physics_steps_per_frame=12
 3d/physics_engine="Jolt Physics"
 jolt_physics_3d/simulation/velocity_steps=16
 jolt_physics_3d/simulation/position_steps=4
 3d/default_gravity=12.0
-common/physics_interpolation=true
