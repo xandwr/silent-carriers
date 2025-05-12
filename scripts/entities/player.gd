@@ -51,6 +51,20 @@ func _ready() -> void:
 		set_process_input(false)
 
 
+func _process(delta: float) -> void:
+	scoreboard.player_list.clear()
+	for peer_id in PlayerRegistry.players:
+		if peer_id == str(multiplayer.get_unique_id()):
+			scoreboard.player_list.add_item(peer_id + " (you)")
+		else:
+			scoreboard.player_list.add_item(peer_id)
+	
+	if Input.is_action_pressed("scoreboard"):
+		scoreboard.visible = true
+	else:
+		scoreboard.visible = false
+
+
 func _physics_process(delta: float) -> void:
 	if not is_multiplayer_authority(): return
 	
@@ -74,13 +88,9 @@ func _input(event: InputEvent) -> void:
 	
 	if event.is_action_pressed("interact"):
 		if held_body:
-			print("Should drop")
 			_drop_body()
 		else:
 			_try_pickup()
-	
-	if event.is_action("scoreboard"):
-		scoreboard.visible = !scoreboard.visible
 
 
 func _try_pickup():
