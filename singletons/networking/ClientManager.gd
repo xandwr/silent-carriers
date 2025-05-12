@@ -28,10 +28,13 @@ func _on_connected_to_server() -> void:
 	print("Client: Connected to server")
 	
 	# Send our player info to the server
-	PlayerRegistry.rpc_id(1, "register_client_info", {
-		"name": GameManager.local_player_name
-	})
+	var my_info = {
+		"name": "Player " + str(multiplayer.get_unique_id()),
+		"color": Color.from_hsv(randf(), 0.8, 0.9),
+		"ready": false
+	}
 	
+	PlayerRegistry.rpc_id(1, "register_client_info", my_info)
 	NetworkManager.connection_established.emit()
 
 

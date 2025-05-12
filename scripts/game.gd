@@ -26,10 +26,20 @@ func _parse_cmd_args() -> void:
 
 func _on_imgui_layout() -> void:
 	ImGui.Begin("Debug")
-	ImGui.SetWindowSize(Vector2(400, 100))
+	ImGui.SetWindowSize(Vector2(300, 200))
 	
-	ImGui.Text("Peer ID: %s" % multiplayer.get_unique_id())
-	ImGui.Text("Player Info: %s" % PlayerRegistry.players.get(str(multiplayer.get_unique_id())))
-	ImGui.Text("Current scene: %s" % GameManager.current_scene_name if GameManager.current_scene_name else "<null>")
+	var my_id := multiplayer.get_unique_id()
+	var player_info = PlayerRegistry.players.get(str(my_id), {})
 	
+	ImGui.Text("Peer ID: %s" % my_id)
+	ImGui.Separator()
+	ImGui.Text("Player Info:")
+	
+	for key in player_info.keys():
+		var value = player_info[key]
+		ImGui.Text("  %s: %s" % [key, str(value)])
+	
+	ImGui.Separator()
+	ImGui.Text("Current scene: %s" % (GameManager.current_scene_name if GameManager.current_scene_name else "<null>"))
+
 	ImGui.End()

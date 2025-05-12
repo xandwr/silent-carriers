@@ -31,8 +31,16 @@ func _on_player_connected(peer_id: int) -> void:
 	NetworkManager.player_connected.emit(peer_id)
 	
 	if multiplayer.is_server():
-		# Send updated registry to ALL peers (not just the new one goddammit lol)
+		# Send updated registry to ALL peers
 		NetworkManager.rpc("_client_receive_player_registry", PlayerRegistry.players)
+		
+		# IMPORTANT: Spawn the player in the current scene
+		var current_scene = SceneManager.current_scene
+		if current_scene is NetworkedScene:
+			print("Server spawning player %d in current scene" % peer_id)
+			spawn_player(peer_id)
+	
+	NetworkManager.update_all_player_names()
 
 
 func _on_player_disconnected(peer_id: int) -> void:
@@ -45,10 +53,17 @@ func _on_player_disconnected(peer_id: int) -> void:
 func spawn_player(peer_id: int) -> void:
 	var current_scene = SceneManager.current_scene
 	if current_scene is NetworkedScene:
-		var player = current_scene.spawn_player(peer_id)
+		# Check if player already exists
+		var existing_player = current_scene.player_container.get_node_or_null(str(peer_id))
+		if existing_player:
+			print("Player %d already exists, not spawning again" % peer_id)
+			return
+		
+		print("Spawning player %d" % peer_id)
+		var player = await current_scene.spawn_player(peer_id)
 		var player_name = PlayerRegistry.get_player_name(peer_id)
-		if player:
-			player.rpc_id(peer_id, "set_player_name", player_name)
+		
+		if is_instance_valid(player):
 			player.rpc("set_player_name", player_name)
 
 
@@ -57,10 +72,13 @@ func load_scene_and_spawn_all(path: String) -> void:
 	
 	# Spawn all connected players in the new scene
 	for peer_id in multiplayer.get_peers():
-		spawn_player(peer_id)
+		await spawn_player(peer_id)
 	
 	# Also spawn the host's player
-	spawn_player(multiplayer.get_unique_id())
+	await spawn_player(multiplayer.get_unique_id())
 	
-	await get_tree().process_frame  # Wait for nodes to be ready
+	# Wait an extra frame for everything to settle
+	await get_tree().process_frame
+	
+	# Now update all names after everything is ready
 	NetworkManager.update_all_player_names()

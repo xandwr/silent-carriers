@@ -86,13 +86,6 @@ func load_scene_and_spawn_all(path: String) -> void:
 func _on_player_connected(peer_id: int) -> void:
 	print("Player %d connected." % peer_id)
 	player_connected.emit(peer_id)
-	
-	# Only host/server authority spawns players
-	if is_host:
-		var current_scene = SceneManager.current_scene
-		if current_scene is NetworkedScene:
-			PlayerRegistry.register_player(peer_id)
-			current_scene.spawn_player(peer_id)
 
 
 func _on_player_disconnected(peer_id: int) -> void:
@@ -160,17 +153,28 @@ func _server_request_drop() -> void:
 
 @rpc("authority", "reliable")
 func update_all_player_names() -> void:
-	# Call this after loading a scene to ensure all player names are up to date
+	print("Updating all player names, is_server: %s" % multiplayer.is_server())
 	if not multiplayer.is_server(): return
 	
+	print("PlayerRegistry contains: %s" % [PlayerRegistry.players])
+	
+	# Force a sync of ALL player names to ALL clients
 	for peer_id_str in PlayerRegistry.players:
 		var peer_id = int(peer_id_str)
 		var player = PlayerRegistry.get_player(peer_id)
 		var player_name = PlayerRegistry.get_player_name(peer_id)
 		
+		print("Setting name for peer %s to '%s', player exists: %s" % 
+			  [peer_id, player_name, player != null])
+		
 		if player:
-			# Sync to everyone
-			player.rpc("set_player_name", player_name)
+			call_deferred("_set_player_name_for_all", player, player_name)
+
+
+## Helper function to ensure we set player names at the right time
+func _set_player_name_for_all(player: Player, player_name: String) -> void:
+	# This RPC will be sent to ALL peers including those who just connected
+	player.rpc("set_player_name", player_name)
 
 
 ## Updates the position of held objects for each player from the server.

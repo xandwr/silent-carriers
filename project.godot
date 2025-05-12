@@ -16,11 +16,11 @@ config/features=PackedStringArray("4.4", "Forward Plus")
 
 [autoload]
 
+PlayerRegistry="*res://singletons/networking/PlayerRegistry.gd"
 SceneManager="*res://singletons/SceneManager.gd"
 ServerManager="*res://singletons/networking/ServerManager.gd"
 ClientManager="*res://singletons/networking/ClientManager.gd"
 NetworkManager="*res://singletons/networking/NetworkManager.gd"
-PlayerRegistry="*res://singletons/networking/PlayerRegistry.gd"
 GameManager="*res://singletons/GameManager.gd"
 ImGuiRoot="*res://addons/imgui-godot/data/ImGuiRoot.tscn"
 

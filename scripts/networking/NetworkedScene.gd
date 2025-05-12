@@ -10,20 +10,21 @@ class_name NetworkedScene extends Node
 func _ready() -> void:
 	print("NetworkedScene loaded: %s" % name)
 	GameManager.current_scene_name = name
-	
-	spawn_package(Vector3(0, 5, -5))
 
 
 func spawn_player(peer_id: int) -> Player:
+	print("NetworkedScene spawning player %d" % peer_id)
 	if not player_container:
 		push_error("Player container not set in NetworkedScene %s!" % name)
-		return
+		return null
 	
 	var player = player_scene.instantiate() as Player
 	player.name = str(peer_id)
 	
+	print("Setting multiplayer authority for player %d" % peer_id)
 	player.set_multiplayer_authority(peer_id)
 	player_container.add_child(player, true)
+	print("Player %d spawned successfully" % peer_id)
 	return player
 
 

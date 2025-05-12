@@ -46,6 +46,10 @@ func update_player(peer_id: int, field: String, value) -> void:
 		player_updated.emit(peer_id, field, value)
 
 
+func has_peer(peer_id: int) -> bool:
+	return players.has(str(peer_id))
+
+
 func get_player(peer_id: int) -> Player:
 	if not SceneManager.current_scene:
 		return null
@@ -61,15 +65,29 @@ func get_player_name(peer_id: int) -> String:
 	return players.get(str(peer_id), {}).get("name", "Unknown Player")
 
 
+@rpc("any_peer", "reliable")
+func set_player_ready(peer_id: int, is_ready: bool) -> void:
+	if not multiplayer.is_server():
+		# Forward request to server
+		rpc_id(1, "set_player_ready", peer_id, is_ready)
+		return
+	
+	# Update on server
+	update_player(peer_id, "ready", is_ready)
+	
+	# Sync full registry to all clients
+	rpc("sync_player_registry", players)
+
+
 ## Network synchronization
 @rpc("any_peer", "reliable")
 func register_client_info(info: Dictionary) -> void:
 	var peer_id = multiplayer.get_remote_sender_id()
 	
 	if multiplayer.is_server():
-		# Register the client's info first
+		# Actually use the info parameter!
 		register_player(peer_id, info)
-		# Then sync the updated registry
+		# Then sync to everyone
 		rpc("sync_player_registry", players)
 
 

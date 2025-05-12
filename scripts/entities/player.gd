@@ -92,15 +92,21 @@ func _input(event: InputEvent) -> void:
 		if held_body:
 			_drop_body()
 		else:
-			_try_pickup()
+			if interaction_raycast.is_colliding():
+				var hit = interaction_raycast.get_collider()
+				
+				if hit is Pickable:
+					_try_pickup(hit)
+				elif hit is PhysicalButton:
+					if multiplayer.is_server():
+						hit.activate_by(multiplayer.get_unique_id())
+					else:
+						hit.rpc_id(1, "request_toggle_by")
 
 
-func _try_pickup():
-	if interaction_raycast.is_colliding():
-		var body = interaction_raycast.get_collider() as Pickable
-		if body:
-			attempted_pickup = body
-			NetworkManager.rpc_id(1, "_server_request_pickup", body.get_path())
+func _try_pickup(body: Pickable):
+	attempted_pickup = body
+	NetworkManager.rpc_id(1, "_server_request_pickup", body.get_path())
 
 
 func _drop_body():
@@ -148,6 +154,6 @@ func _process_mouselook(mouse_event: InputEventMouseMotion) -> void:
 
 
 @rpc("any_peer", "call_local", "reliable")
-func set_player_name(_name: String) -> void:
-	player_name = _name
-	name_label.text = _name
+func set_player_name(p_name: String) -> void:
+	player_name = p_name
+	name_label.text = p_name

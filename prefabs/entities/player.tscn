@@ -23,9 +23,6 @@ properties/3/replication_mode = 2
 properties/4/path = NodePath("CameraPivot/PlayerCamera/HoldPoint:rotation")
 properties/4/spawn = true
 properties/4/replication_mode = 2
-properties/5/path = NodePath(".:player_name")
-properties/5/spawn = true
-properties/5/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_0on4b"]
 radius = 0.2
@@ -58,6 +55,7 @@ far = 2500.0
 [node name="InteractionRaycast" type="RayCast3D" parent="CameraPivot/PlayerCamera"]
 target_position = Vector3(0, 0, -2)
 collision_mask = 2
+collide_with_areas = true
 
 [node name="HoldPoint" type="Marker3D" parent="CameraPivot/PlayerCamera"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
@@ -104,3 +102,22 @@ horizontal_alignment = 1
 [node name="ItemList" type="ItemList" parent="Scoreboard/PanelContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="Crosshair" type="CenterContainer" parent="."]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="Crosshair"]
+layout_mode = 2
+text = "+"
+horizontal_alignment = 1
+vertical_alignment = 1
