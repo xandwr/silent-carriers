@@ -3,7 +3,10 @@ class_name Game extends Node
 
 func _ready() -> void:
 	ImGuiGD.Connect(_on_imgui_layout)
-	
+	_parse_cmd_args()
+
+
+func _parse_cmd_args() -> void:
 	var cmd_args = OS.get_cmdline_args()
 	
 	for arg in cmd_args:
@@ -23,10 +26,10 @@ func _ready() -> void:
 
 func _on_imgui_layout() -> void:
 	ImGui.Begin("Debug")
-	ImGui.SetWindowSize(Vector2(200, 100))
+	ImGui.SetWindowSize(Vector2(400, 100))
 	
 	ImGui.Text("Peer ID: %s" % multiplayer.get_unique_id())
-	ImGui.Text("Player Info: %s" % str(PlayerRegistry.players) if PlayerRegistry.players else "<null>")
+	ImGui.Text("Player Info: %s" % PlayerRegistry.players.get(str(multiplayer.get_unique_id())))
 	ImGui.Text("Current scene: %s" % GameManager.current_scene_name if GameManager.current_scene_name else "<null>")
 	
 	ImGui.End()

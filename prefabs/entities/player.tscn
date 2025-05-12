@@ -17,6 +17,12 @@ properties/1/replication_mode = 2
 properties/2/path = NodePath("CameraPivot:rotation:x")
 properties/2/spawn = true
 properties/2/replication_mode = 2
+properties/3/path = NodePath("CameraPivot/PlayerCamera/HoldPoint:position")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("CameraPivot/PlayerCamera/HoldPoint:rotation")
+properties/4/spawn = true
+properties/4/replication_mode = 2
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_0on4b"]
 radius = 0.2
@@ -30,7 +36,8 @@ material = SubResource("StandardMaterial3D_0on4b")
 size = Vector3(0.25, 0.05, 0.1)
 
 [node name="Player" type="CharacterBody3D"]
-collision_layer = 2
+collision_layer = 524288
+collision_mask = 3
 script = ExtResource("1_0on4b")
 
 [node name="PlayerCollider" type="CollisionShape3D" parent="."]
@@ -44,6 +51,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 fov = 70.0
 near = 0.01
 far = 2500.0
+
+[node name="InteractionRaycast" type="RayCast3D" parent="CameraPivot/PlayerCamera"]
+target_position = Vector3(0, 0, -2)
+collision_mask = 2
+
+[node name="HoldPoint" type="Marker3D" parent="CameraPivot/PlayerCamera"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1.5)
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_0on4b")

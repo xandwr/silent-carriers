@@ -1,15 +1,17 @@
 class_name NetworkedScene extends Node
 
-## The node connected to a MultiplayerSpawner that we instance new players in for automatic replication.
 @export var player_container: Node
+@export var package_container: Node
 
-## The player scene.
 @onready var player_scene: PackedScene = preload("uid://bfd1m7fd2g0sj")
+@onready var package_scene: PackedScene = preload("uid://paf44kxq6kf7")
 
 
 func _ready() -> void:
 	print("NetworkedScene loaded: %s" % name)
 	GameManager.current_scene_name = name
+	
+	spawn_package(Vector3(0, 5, -5))
 
 
 func spawn_player(peer_id: int) -> void:
@@ -22,3 +24,15 @@ func spawn_player(peer_id: int) -> void:
 	
 	player.set_multiplayer_authority(peer_id)
 	player_container.add_child(player, true)
+
+
+func spawn_package(position: Vector3) -> void:
+	if not package_container:
+		push_error("Package container not set in NetworkedScene %s!" % name)
+		return
+	
+	var package = package_scene.instantiate()
+	package.name = "Package"
+	
+	package_container.add_child(package, true)
+	package.global_position = position

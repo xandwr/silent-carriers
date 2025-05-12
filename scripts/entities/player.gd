@@ -11,6 +11,8 @@ class_name Player extends CharacterBody3D
 @onready var camera_pivot: Marker3D = $CameraPivot
 @onready var player_camera: Camera3D = $CameraPivot/PlayerCamera
 @onready var name_label: Label3D = $NameLabel
+@onready var interaction_raycast: RayCast3D = $CameraPivot/PlayerCamera/InteractionRaycast
+@onready var hold_point: Marker3D = $CameraPivot/PlayerCamera/HoldPoint
 
 @onready var player_mesh: MeshInstance3D = $PlayerCapsuleMesh
 @onready var player_eyes_mesh: MeshInstance3D = $PlayerCapsuleMesh/EyesMesh
@@ -22,6 +24,7 @@ var mouse_locked: bool = true:
 	set(value):
 		mouse_locked = value
 		Input.mouse_mode = Input.MOUSE_MODE_CAPTURED if value else Input.MOUSE_MODE_VISIBLE
+var held_body: Pickable = null
 
 
 func _enter_tree() -> void:
@@ -29,7 +32,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	_hide_scoreboard()
+	scoreboard.visible = false
 	
 	if get_multiplayer_authority() == multiplayer.get_unique_id():
 		GameManager.player_instance = self
@@ -67,8 +70,28 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("pause"):
 		mouse_locked = !mouse_locked
 	
+	if event.is_action_pressed("interact"):
+		if held_body:
+			print("Should drop")
+			_drop_body()
+		else:
+			_try_pickup()
+	
 	if event.is_action("scoreboard"):
 		scoreboard.visible = !scoreboard.visible
+
+
+func _try_pickup():
+	if interaction_raycast.is_colliding():
+		var body = interaction_raycast.get_collider() as Pickable
+		if body:
+			held_body = body
+			NetworkManager.rpc_id(1, "_server_request_pickup", body.get_path())
+
+
+func _drop_body():
+	NetworkManager.rpc_id(1, "_server_request_drop")
+	held_body = null
 
 
 func _process_movement(delta: float) -> void:
@@ -107,10 +130,4 @@ func _process_mouselook(mouse_event: InputEventMouseMotion) -> void:
 	
 	rotation.y -= mouse_motion.x
 
-
-func _show_scoreboard() -> void:
-	scoreboard.visible = true
-
-
-func _hide_scoreboard() -> void:
 	scoreboard.visible = false

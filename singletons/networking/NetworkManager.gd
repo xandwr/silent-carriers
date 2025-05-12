@@ -8,6 +8,9 @@ signal player_disconnected(peer_id: int)
 
 var is_host: bool = false
 
+# map of peer_id -> Pickable
+var held_by_peer: Dictionary[int, Pickable] = {}
+
 
 func _ready() -> void:
 	multiplayer.peer_connected.connect(_on_player_connected)
@@ -20,6 +23,10 @@ func _ready() -> void:
 		host_game()
 	elif "client" in cmd_args:
 		join_game()
+
+
+func _physics_process(delta: float) -> void:
+	_update_pickables(delta)
 
 
 func host_game(port: int = 7000, max_players: int = 4) -> void:
@@ -74,11 +81,6 @@ func load_scene_and_spawn_all(path: String) -> void:
 		current_scene.spawn_player(multiplayer.get_unique_id())
 
 
-## Returns true if this instance is the authority for the provided Node.
-func is_authority_for(node: Node) -> bool:
-	return node.get_multiplayer_authority() == multiplayer.get_unique_id()
-
-
 func _on_player_connected(peer_id: int) -> void:
 	print("Player %d connected." % peer_id)
 	player_connected.emit(peer_id)
@@ -94,3 +96,49 @@ func _on_player_connected(peer_id: int) -> void:
 func _on_player_disconnected(peer_id: int) -> void:
 	print("Player %d disconnected." % peer_id)
 	player_disconnected.emit(peer_id)
+	
+	# Clean up stale references if someone leaves while holding something
+	if held_by_peer.has(peer_id):
+		var body = held_by_peer[peer_id]
+		body.freeze = false
+		body.held_by = 0
+		held_by_peer.erase(peer_id)
+
+
+## ITEM PICKUP RPCS ##
+@rpc("any_peer", "call_local", "reliable")
+func _server_request_pickup(body_path: NodePath) -> void:
+	if not multiplayer.is_server():
+		return
+	
+	var body = get_node_or_null(body_path) as Pickable
+	if body and body.held_by == 0:
+		var peer_id = multiplayer.get_remote_sender_id()
+		held_by_peer[peer_id] = body
+		body.held_by = peer_id
+		body.freeze_mode = RigidBody3D.FREEZE_MODE_KINEMATIC
+		body.freeze = true
+	else:
+		print("Pickup denied: already held or invalid body")
+
+
+@rpc("any_peer", "call_local", "reliable")
+func _server_request_drop() -> void:
+	if not multiplayer.is_server(): return
+	var peer = multiplayer.get_remote_sender_id()
+	if held_by_peer.has(peer):
+		var body = held_by_peer[peer]
+		held_by_peer.erase(peer)
+		body.freeze = false
+		body.held_by = 0
+
+
+## Updates the position of held objects for each player from the server.
+func _update_pickables(_delta: float) -> void:
+	if not multiplayer.is_server(): return
+	
+	for peer_id in held_by_peer.keys():
+		var body: Pickable = held_by_peer[peer_id]
+		var player: Player = PlayerRegistry.get_player(peer_id)
+		if player and body:
+			body.global_transform = player.hold_point.global_transform 

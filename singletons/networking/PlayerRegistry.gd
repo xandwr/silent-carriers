@@ -46,9 +46,15 @@ func update_player(peer_id: int, field: String, value) -> void:
 		player_updated.emit(peer_id, field, value)
 
 
-## Gets a player's full info or a specific field
-func get_player(peer_id: int) -> Dictionary:
-	return players.get(str(peer_id), {}).duplicate()
+func get_player(peer_id: int) -> Player:
+	if not SceneManager.current_scene:
+		return null
+	
+	var scene := SceneManager.current_scene
+	if scene is NetworkedScene and scene.player_container:
+		return scene.player_container.get_node_or_null(str(peer_id)) as Player
+	
+	return null
 
 
 func get_player_name(peer_id: int) -> String:
