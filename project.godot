@@ -34,6 +34,10 @@ window/subwindows/embed_subwindows=false
 
 enabled=PackedStringArray("res://addons/imgui-godot/plugin.cfg")
 
+[global_group]
+
+players=""
+
 [input]
 
 move_forward={

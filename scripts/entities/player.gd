@@ -30,6 +30,9 @@ var mouse_locked: bool = true:
 var attempted_pickup: Pickable = null
 var held_body: Pickable = null
 
+var is_seated: bool = false
+var current_seat: DriverSeat = null
+
 
 func _enter_tree() -> void:
 	set_multiplayer_authority(name.to_int())
@@ -53,7 +56,7 @@ func _ready() -> void:
 		set_process_input(false)
 
 
-func _process(_delta: float) -> void:	
+func _process(delta: float) -> void:	
 	scoreboard.player_list.clear()
 	for peer_id in PlayerRegistry.players:
 		if peer_id == str(multiplayer.get_unique_id()):
@@ -65,6 +68,46 @@ func _process(_delta: float) -> void:
 		scoreboard.visible = true
 	else:
 		scoreboard.visible = false
+	
+	if is_seated and current_seat:
+		# Match position with seat
+		global_position = current_seat.seat_socket.global_position
+		
+		_process_driving_input(delta)
+		return
+
+
+@rpc("any_peer", "call_local")
+func _rpc_enter_vehicle(seat_path: NodePath):
+	print("RPC enter vehicle called with path: ", seat_path)
+	var seat = get_node(seat_path)
+	if seat and seat is DriverSeat:
+		if current_seat: 
+			print("Already in a seat, ignoring")
+			return
+		print("Entering vehicle!")
+		enter_vehicle(seat)
+	else:
+		print("ERROR: Invalid seat path or not a DriverSeat: ", seat_path)
+
+
+@rpc("any_peer", "call_local")
+func _rpc_exit_vehicle():
+	exit_vehicle()
+
+
+# In Player.gd's _process_driving_input
+func _process_driving_input(delta: float) -> void:
+	var cart = current_seat.cart
+	if not cart: return
+	
+	var throttle_input = Input.get_axis("move_backward", "move_forward")
+	var steer_input = Input.get_axis("move_right", "move_left")
+	
+	# Apply input locally 
+	cart.throttle = throttle_input 
+	cart.steer = steer_input
+
 
 
 func _physics_process(delta: float) -> void:
@@ -76,7 +119,8 @@ func _physics_process(delta: float) -> void:
 		if player_eyes_mesh.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY:
 			player_eyes_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 	
-	_process_movement(delta)
+	if not is_seated:
+		_process_movement(delta)
 
 
 func _input(event: InputEvent) -> void:
@@ -91,6 +135,12 @@ func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("interact"):
 		if held_body:
 			_drop_body()
+		elif is_seated and current_seat:
+			if NetworkManager.is_host:
+				current_seat._process_exit(multiplayer.get_unique_id())
+			else:
+				current_seat.request_exit.rpc_id(1, multiplayer.get_unique_id())
+			return
 		else:
 			if interaction_raycast.is_colliding():
 				var hit = interaction_raycast.get_collider()
@@ -102,6 +152,25 @@ func _input(event: InputEvent) -> void:
 						hit.activate_by(multiplayer.get_unique_id())
 					else:
 						hit.rpc_id(1, "request_toggle_by")
+				elif hit is DriverSeat:
+					hit.interact(multiplayer.get_unique_id())
+
+
+func enter_vehicle(seat: DriverSeat) -> void:
+	is_seated = true
+	current_seat = seat
+	
+	global_transform = seat.seat_socket.global_transform
+
+
+func exit_vehicle() -> void:
+	is_seated = false
+	
+	# Nudge upward to avoid floor clipping
+	global_position += Vector3(0, 1, 0)
+	
+	if current_seat:
+		current_seat = null
 
 
 func _try_pickup(body: Pickable):

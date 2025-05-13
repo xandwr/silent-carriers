@@ -1,0 +1,295 @@
+[gd_scene load_steps=13 format=4 uid="uid://cgt3vlotbeycq"]
+
+[ext_resource type="Script" uid="uid://bcg0rt83a7dp6" path="res://scripts/cart/trailer_cart.gd" id="1_vkse4"]
+[ext_resource type="Script" uid="uid://bfxkrfj6rp03j" path="res://scripts/cart/driver_seat.gd" id="2_vkse4"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_xx05m"]
+rough = true
+bounce = 0.4
+absorbent = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_tpqye"]
+size = Vector3(4, 0.2, 6)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_th6hv"]
+_surfaces = [{
+"aabb": AABB(-2, -0.1, -3, 4, 0.2, 6),
+"attribute_data": PackedByteArray("AACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/AACAPwAAgD8AAIA/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAPwAAgD8AAIA/"),
+"format": 34359738391,
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 36,
+"vertex_data": PackedByteArray("AAAAwM3MzL0AAEBAAAAAwM3MzL0AAEDAAAAAwM3MzD0AAEDAAAAAQM3MzL0AAEDAAAAAwM3MzL0AAEDAAAAAwM3MzL0AAEBAAAAAwM3MzD0AAEDAAAAAwM3MzL0AAEDAAAAAQM3MzL0AAEDAAAAAwM3MzD0AAEDAAAAAwM3MzD0AAEBAAAAAwM3MzL0AAEBAAAAAwM3MzL0AAEBAAAAAwM3MzD0AAEBAAAAAQM3MzD0AAEBAAAAAQM3MzD0AAEBAAAAAwM3MzD0AAEBAAAAAwM3MzD0AAEDAAAAAwM3MzL0AAEBAAAAAQM3MzL0AAEBAAAAAQM3MzL0AAEDAAAAAQM3MzD0AAEBAAAAAQM3MzL0AAEBAAAAAwM3MzL0AAEBAAAAAQM3MzL0AAEDAAAAAQM3MzL0AAEBAAAAAQM3MzD0AAEBAAAAAQM3MzL0AAEDAAAAAQM3MzD0AAEDAAAAAwM3MzD0AAEDAAAAAwM3MzD0AAEDAAAAAQM3MzD0AAEDAAAAAQM3MzD0AAEBAAAAAQM3MzD0AAEBAAAAAQM3MzD0AAEDAAAAAQM3MzL0AAEDAAAD/f/9//n8AAP9//3/+fwAA/3//f/5//38AAP//AAD/fwAA//8AAP9/AAD//wAA/////wAA/z//////AAD/P/////8AAP8/AAD/f/9//n8AAP9//3/+fwAA/3//f/5//3//fwAA/z//f/9/AAD/P/9//38AAP8//3//////AAD/f/////8AAP9//////wAA/38AAP//AAD/fwAA//8AAP9/AAD//wAA/3//fwAA/z//f/9/AAD/P/9//38AAP8/////f/9//n////9//3/+f////3//f/5//////wAA/z//////AAD/P/////8AAP8//3//////AAD/f/////8AAP9//////wAA////f/9//n////9//3/+f////3//f/5/")
+}]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_tpqye"]
+height = 0.2
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vkse4"]
+rough = true
+bounce = 0.4
+absorbent = true
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_th6hv"]
+size = Vector3(4, 0.2, 5)
+
+[sub_resource type="BoxMesh" id="BoxMesh_vkse4"]
+size = Vector3(4, 0.2, 5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_vkse4"]
+size = Vector3(1.9, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_xx05m"]
+size = Vector3(1.2, 0.1, 0.6)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_gpevy"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 2
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 2
+properties/2/path = NodePath("Trailer:position")
+properties/2/spawn = true
+properties/2/replication_mode = 2
+properties/3/path = NodePath("Trailer:rotation")
+properties/3/spawn = true
+properties/3/replication_mode = 2
+properties/4/path = NodePath("Cab:position")
+properties/4/spawn = true
+properties/4/replication_mode = 2
+properties/5/path = NodePath("Cab:rotation")
+properties/5/spawn = true
+properties/5/replication_mode = 2
+properties/6/path = NodePath("Trailer/VehicleWheel3D:steering")
+properties/6/spawn = true
+properties/6/replication_mode = 2
+properties/7/path = NodePath("Trailer/VehicleWheel3D3:steering")
+properties/7/spawn = true
+properties/7/replication_mode = 2
+properties/8/path = NodePath("Cab/VehicleWheel3D:steering")
+properties/8/spawn = true
+properties/8/replication_mode = 2
+properties/9/path = NodePath("Cab/VehicleWheel3D3:steering")
+properties/9/spawn = true
+properties/9/replication_mode = 2
+properties/10/path = NodePath(".:engine_power")
+properties/10/spawn = true
+properties/10/replication_mode = 2
+properties/11/path = NodePath(".:max_steer")
+properties/11/spawn = true
+properties/11/replication_mode = 2
+properties/12/path = NodePath(".:brake_power")
+properties/12/spawn = true
+properties/12/replication_mode = 2
+properties/13/path = NodePath(".:driver_id")
+properties/13/spawn = true
+properties/13/replication_mode = 2
+properties/14/path = NodePath("Cab/VehicleWheel3D:engine_force")
+properties/14/spawn = true
+properties/14/replication_mode = 2
+properties/15/path = NodePath("Cab/VehicleWheel3D:brake")
+properties/15/spawn = true
+properties/15/replication_mode = 2
+properties/16/path = NodePath("Cab/VehicleWheel3D3:engine_force")
+properties/16/spawn = true
+properties/16/replication_mode = 2
+properties/17/path = NodePath("Cab/VehicleWheel3D3:brake")
+properties/17/spawn = true
+properties/17/replication_mode = 2
+properties/18/path = NodePath("Trailer:freeze")
+properties/18/spawn = true
+properties/18/replication_mode = 2
+properties/19/path = NodePath("Cab:freeze")
+properties/19/spawn = true
+properties/19/replication_mode = 2
+
+[node name="Cart_4P_Simple" type="Node3D" node_paths=PackedStringArray("trailer_body", "cab_body")]
+script = ExtResource("1_vkse4")
+trailer_body = NodePath("Trailer")
+cab_body = NodePath("Cab")
+brake_power = 200.0
+
+[node name="Trailer" type="VehicleBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 3)
+mass = 800.0
+physics_material_override = SubResource("PhysicsMaterial_xx05m")
+freeze_mode = 1
+continuous_cd = true
+linear_damp = 1.0
+angular_damp = 0.2
+
+[node name="TrailerCollider" type="CollisionShape3D" parent="Trailer"]
+shape = SubResource("BoxShape3D_tpqye")
+
+[node name="TrailerMesh" type="MeshInstance3D" parent="Trailer"]
+mesh = SubResource("ArrayMesh_th6hv")
+skeleton = NodePath("../..")
+
+[node name="VehicleWheel3D" type="VehicleWheel3D" parent="Trailer"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -2.2, -0.423628, -1.9)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_friction_slip = 1.0
+suspension_travel = 0.4
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Trailer/VehicleWheel3D"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="VehicleWheel3D2" type="VehicleWheel3D" parent="Trailer"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -2.2, -0.423628, 1.7)
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_friction_slip = 1.0
+suspension_travel = 0.4
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Trailer/VehicleWheel3D2"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="VehicleWheel3D3" type="VehicleWheel3D" parent="Trailer"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 2.2, -0.423628, -1.9)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_friction_slip = 1.0
+suspension_travel = 0.4
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Trailer/VehicleWheel3D3"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="VehicleWheel3D4" type="VehicleWheel3D" parent="Trailer"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 2.2, -0.423628, 1.7)
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_friction_slip = 1.0
+suspension_travel = 0.4
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Trailer/VehicleWheel3D4"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="Cab" type="VehicleBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -4)
+mass = 600.0
+physics_material_override = SubResource("PhysicsMaterial_vkse4")
+freeze_mode = 1
+continuous_cd = true
+linear_damp = 1.0
+angular_damp = 0.2
+
+[node name="CabCollider" type="CollisionShape3D" parent="Cab"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.19209e-07, 0)
+shape = SubResource("BoxShape3D_th6hv")
+
+[node name="CabMesh" type="MeshInstance3D" parent="Cab"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.19209e-07, 0)
+mesh = SubResource("BoxMesh_vkse4")
+skeleton = NodePath("../..")
+
+[node name="VehicleWheel3D" type="VehicleWheel3D" parent="Cab"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -2.2, -0.4, -1.2)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_rest_length = 0.2
+wheel_friction_slip = 10.0
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Cab/VehicleWheel3D"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="VehicleWheel3D2" type="VehicleWheel3D" parent="Cab"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -2.2, -0.4, 1.2)
+use_as_traction = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_friction_slip = 1.0
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Cab/VehicleWheel3D2"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="VehicleWheel3D3" type="VehicleWheel3D" parent="Cab"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 2.2, -0.4, -1.2)
+use_as_traction = true
+use_as_steering = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_rest_length = 0.2
+wheel_friction_slip = 10.0
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Cab/VehicleWheel3D3"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="VehicleWheel3D4" type="VehicleWheel3D" parent="Cab"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 2.2, -0.4, 1.2)
+use_as_traction = true
+wheel_roll_influence = 0.8
+wheel_radius = 0.6
+wheel_friction_slip = 1.0
+suspension_stiffness = 20.0
+damping_compression = 0.7
+damping_relaxation = 0.9
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Cab/VehicleWheel3D4"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tpqye")
+
+[node name="DriverSeatArea" type="Area3D" parent="Cab" node_paths=PackedStringArray("cart", "seat_socket")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, -1.7)
+collision_layer = 2
+collision_mask = 2
+script = ExtResource("2_vkse4")
+cart = NodePath("../..")
+seat_socket = NodePath("DriverSeatSocket")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cab/DriverSeatArea"]
+shape = SubResource("BoxShape3D_vkse4")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Cab/DriverSeatArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.464225, -0.0697446)
+mesh = SubResource("BoxMesh_xx05m")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Cab/DriverSeatArea"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -0.164225, 0.230256)
+mesh = SubResource("BoxMesh_xx05m")
+
+[node name="DriverSeatSocket" type="Marker3D" parent="Cab/DriverSeatArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.4, -0.0999999)
+
+[node name="ConeTwistJoint3D" type="ConeTwistJoint3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -0.8)
+node_a = NodePath("../Cab")
+node_b = NodePath("../Trailer")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_gpevy")
