@@ -1,0 +1,9 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://h1a2nloxpld6"]
+
+[ext_resource type="Texture2D" uid="uid://be3y1g0q5emq1" path="res://assets/models/player/player_texture.png" id="1_d1vyp"]
+
+[resource]
+resource_name = "Humanoid_NotOverlapping"
+transparency = 4
+cull_mode = 2
+albedo_texture = ExtResource("1_d1vyp")

@@ -1,0 +1,39 @@
+[gd_scene load_steps=6 format=3 uid="uid://b8qa7e73nmq6m"]
+
+[ext_resource type="Texture2D" uid="uid://cfvxhcev41ny0" path="res://assets/debug/textures/debug_blue_1x1.png" id="1_smuca"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_igbvv"]
+albedo_texture = ExtResource("1_smuca")
+uv1_triplanar = true
+texture_filter = 2
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_yqjtg"]
+sky_top_color = Color(0.437995, 0.663349, 0.90929, 1)
+sky_horizon_color = Color(0.655035, 0.75772, 0.909414, 1)
+sky_curve = 0.310579
+ground_bottom_color = Color(0.293635, 0.251835, 0.203321, 1)
+ground_horizon_color = Color(0.25678, 0.263616, 0.274407, 1)
+ground_curve = 0.0103526
+sun_curve = 0.102453
+
+[sub_resource type="Sky" id="Sky_lnu2h"]
+sky_material = SubResource("ProceduralSkyMaterial_yqjtg")
+
+[sub_resource type="Environment" id="Environment_lbhrr"]
+background_mode = 2
+sky = SubResource("Sky_lnu2h")
+
+[node name="Safehouse" type="Node3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(50, 1, 50)
+material = SubResource("StandardMaterial3D_igbvv")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_lbhrr")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0.212717, 0.13342, 0.967962, -0.452498, 0.891457, -0.0234345, 0, 0, 0)
+shadow_enabled = true
