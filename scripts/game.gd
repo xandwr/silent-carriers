@@ -7,9 +7,9 @@ extends Node3D
 @onready var menu: Control = $MainMenu
 @onready var nick_input: LineEdit = $MainMenu/PanelContainer/MarginContainer/VBoxContainer/HBoxContainer/NameEdit
 
-@onready var message: LineEdit = $MultiplayerChat/Message
-@onready var send: Button = $MultiplayerChat/Send
-@onready var chat: TextEdit = $MultiplayerChat/Chat
+@onready var message: LineEdit = $MultiplayerChat/MarginContainer/VBoxContainer/MessageEdit
+@onready var send: Button = $MultiplayerChat/MarginContainer/VBoxContainer/Send
+@onready var chat: TextEdit = $MultiplayerChat/MarginContainer/VBoxContainer/Chat
 @onready var multiplayer_chat: Control = $MultiplayerChat
 
 var chat_visible = false

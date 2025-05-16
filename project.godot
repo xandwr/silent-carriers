@@ -22,6 +22,7 @@ boot_splash/use_filter=false
 
 Network="*res://singletons/network.gd"
 Util="*res://singletons/util.gd"
+Clothing="*res://singletons/clothing.gd"
 
 [display]
 

@@ -2,7 +2,7 @@ extends CharacterBody3D
 class_name Character
 
 # MOVEMENT
-const MOVE_SPEED := 3.2
+const MOVE_SPEED := 3.0
 const SPRINT_MULTIPLIER := 2.0
 const JUMP_FORCE := 6.0
 const GRAVITY := 20.0
@@ -25,6 +25,7 @@ const CROUCH_TRANSITION_SPEED := 8.0
 @onready var cam_pivot: Node3D = $CamPivot
 @onready var nickname: Label3D = $Nickname
 @onready var player_mesh: MeshInstance3D = $PlayerVisuals/Armature/Skeleton3D/PlayerMesh
+@onready var player_shader: ShaderMaterial = player_mesh.get_active_material(0) as ShaderMaterial
 
 @onready var anim_tree: AnimationTree = $AnimationTree
 ## X: (0.0 -> 1.0) -> (idle, walk, run)
@@ -36,6 +37,7 @@ var last_synced_anim_blend_vector = Vector2.ZERO
 var current_blend: Vector2 = Vector2.ZERO
 
 var mouse_locked: bool = false
+var block_input: bool = false
 
 var wish_dir: Vector3 = Vector3.ZERO
 var input_vector: Vector2 = Vector2.ZERO
@@ -43,7 +45,7 @@ var speed: float = 0.0
 var sprinting: bool = false
 var is_crouching: bool = false
 var current_height: float = STAND_HEIGHT
-	
+
 var current_anim_speed = 1.0
 
 var yaw: float = 0.0
@@ -70,6 +72,8 @@ func _ready():
 	pitch = cam_pivot.rotation_degrees.x
 	
 	if is_multiplayer_authority():
+		set_random_pants_texture()
+		set_random_shirt_texture()
 		player_mesh.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 
 
@@ -82,7 +86,7 @@ func _input(event: InputEvent) -> void:
 func _unhandled_input(event):
 	if not is_multiplayer_authority(): return
 	
-	if event is InputEventMouseMotion and mouse_locked:
+	if event is InputEventMouseMotion and mouse_locked and not block_input:
 		yaw -= event.relative.x * mouse_sens
 		pitch -= event.relative.y * mouse_sens
 		pitch = clamp(pitch, -89.0, 89.0)
@@ -94,10 +98,41 @@ func _unhandled_input(event):
 func _physics_process(delta):
 	if not is_multiplayer_authority(): return
 
-	if get_tree().get_current_scene().has_method("is_chat_visible") and get_tree().get_current_scene().is_chat_visible():
-		return
+	speed = Vector2(velocity.x, velocity.z).length()
+	var normalized_speed = clamp(speed / MAX_SPEED_GROUND, 0.0, 1.0)
+	if is_crouching and normalized_speed > 0.05:
+		normalized_speed = lerp(normalized_speed, 0.5, delta * 8.0)
+	var target_blend: Vector2
 	
-	process_input()
+	if not is_on_floor():
+		target_blend = Vector2(normalized_speed, -1.0)
+	elif Input.is_action_pressed("crouch"):
+		target_blend = Vector2(normalized_speed, 1.0)
+	else:
+		target_blend = Vector2(normalized_speed, 0.0)
+	
+	current_blend = lerp(current_blend, target_blend, delta * 4.0)
+	current_anim_blend_vector = current_blend
+	anim_tree.set("parameters/BlendTree/BlendSpace2D/blend_position", current_anim_blend_vector)
+	
+	if sprinting:
+		current_anim_speed = lerp(current_anim_speed, 1.8, delta * 4.0)
+	elif is_crouching:
+		current_anim_speed = lerp(current_anim_speed, 1.6, delta * 4.0)
+	else:
+		current_anim_speed = lerp(current_anim_speed, 1.0, delta * 4.0)
+	anim_tree.set("parameters/BlendTree/TimeScale/scale", current_anim_speed)
+	
+	if current_anim_blend_vector != last_synced_anim_blend_vector:
+		last_synced_anim_blend_vector = current_anim_blend_vector
+		rpc("remote_set_anim_state", current_anim_blend_vector)
+
+	block_input = get_tree().get_current_scene().has_method("is_chat_visible") and get_tree().get_current_scene().is_chat_visible()
+	
+	if not block_input:
+		process_input()
+	else:
+		wish_dir = Vector3.ZERO
 	
 	var target_height := STAND_HEIGHT
 	sprinting = Input.is_action_pressed("sprint")
@@ -131,35 +166,6 @@ func _physics_process(delta):
 	handle_jump()
 	move_and_slide()
 	
-	speed = Vector2(velocity.x, velocity.z).length()
-	var normalized_speed = clamp(speed / MAX_SPEED_GROUND, 0.0, 1.0)
-	if is_crouching and normalized_speed > 0.05:
-		normalized_speed = lerp(normalized_speed, 0.5, delta * 8.0)
-	var target_blend: Vector2
-	
-	if not is_on_floor():
-		target_blend = Vector2(normalized_speed, -1.0)
-	elif Input.is_action_pressed("crouch"):
-		target_blend = Vector2(normalized_speed, 1.0)
-	else:
-		target_blend = Vector2(normalized_speed, 0.0)
-	
-	current_blend = lerp(current_blend, target_blend, delta * 4.0)
-	current_anim_blend_vector = current_blend
-	anim_tree.set("parameters/BlendTree/BlendSpace2D/blend_position", current_anim_blend_vector)
-	
-	if sprinting:
-		current_anim_speed = lerp(current_anim_speed, 1.8, delta * 4.0)
-	elif is_crouching:
-		current_anim_speed = lerp(current_anim_speed, 1.6, delta * 4.0)
-	else:
-		current_anim_speed = lerp(current_anim_speed, 1.0, delta * 4.0)
-	anim_tree.set("parameters/BlendTree/TimeScale/scale", current_anim_speed)
-	
-	if current_anim_blend_vector != last_synced_anim_blend_vector:
-		last_synced_anim_blend_vector = current_anim_blend_vector
-		rpc("remote_set_anim_state", current_anim_blend_vector)
-	
 	if global_position.y < -50.0:
 		var current_vel = velocity
 		_respawn()
@@ -173,18 +179,18 @@ func process_input():
 
 
 func apply_friction(delta):
-	var speed = velocity.length()
+	var this_speed = velocity.length()
 	
-	if speed < 0.1:
+	if this_speed < 0.1:
 		velocity = Vector3.ZERO
 		return
 	
-	var control = max(STOP_SPEED, speed)
+	var control = max(STOP_SPEED, this_speed)
 	var drop = control * FRICTION * delta
 	
-	var new_speed = max(speed - drop, 0)
+	var new_speed = max(this_speed - drop, 0)
 	if new_speed != 0:
-		new_speed /= speed
+		new_speed /= this_speed
 		velocity *= new_speed
 
 
@@ -235,3 +241,19 @@ func change_nick(new_nick: String):
 func remote_set_anim_state(blend_vector: Vector2):
 	if is_multiplayer_authority(): return
 	anim_tree.set("parameters/BlendTree/BlendSpace2D/blend_position", blend_vector)
+
+
+func set_random_pants_texture():
+	if not is_multiplayer_authority(): return
+	var pants_enum = Clothing.Pants.values().pick_random()
+	var pants = Clothing.get_pants_texture(pants_enum)
+	Clothing.worn_pants = pants
+	player_shader.set_shader_parameter("pants_texture", pants)
+
+
+func set_random_shirt_texture():
+	if not is_multiplayer_authority(): return
+	var shirt_enum = Clothing.Shirt.values().pick_random()
+	var shirt = Clothing.get_shirt_texture(shirt_enum)
+	Clothing.worn_shirt = shirt
+	player_shader.set_shader_parameter("shirt_texture", shirt)
